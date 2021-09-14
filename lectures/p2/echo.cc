@@ -2,7 +2,6 @@
 #include <fstream>
 #include "echo.h"
 
-
 void echo(std::istream &f) {
   f >> std::noskipws;
   char c;
