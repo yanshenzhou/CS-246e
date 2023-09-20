@@ -1,0 +1,27 @@
+Disjunction (Disjunction (Star (a),Disjunction (Star (b),Star (c))),Disjunction (Disjunction (1,Disjunction (Concatenation (2,2),Disjunction (Concatenation (3,3),Concatenation (4,4)))),Concatenation (Concatenation (Star (a),Concatenation (a,Concatenation (b,c))),Concatenation (1,Concatenation (2,Concatenation (3,Star (.)))))))
+true
+true
+true
+false
+true
+true
+true
+false
+true
+true
+true
+true
+false
+false
+false
+false
+true
+true
+true
+false
+false
+false
+false
+true
+true
+false

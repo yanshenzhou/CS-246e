@@ -1,0 +1,27 @@
+newDefault a
+size a
+empty a
+newInit a
+size a
+empty a
+at a 8
+push_back a 0
+at a 8
+push_front a 20
+size a
+at a 8
+pop_front a
+at a 8
+pop_front a
+size a
+at a 8
+[] a 0
+[]= a 0 0
+[] a 0
+size a
+empty a
+[]= a 0 1
+[] a 1
+[]= a 8 12
+[] a 8
+size a

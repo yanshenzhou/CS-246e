@@ -1,0 +1,91 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+
+#include "process.h"
+
+std::string getcurrenteval(std::string word, int start){
+   int subsize = 0;
+   int wlength = word.size();
+
+   if ((start + 1 < wlength) &&
+       ((word.at(start + 1) == '*') ||
+        (word.at(start + 1) == '+') ||
+        (word.at(start + 1) == '?') ||
+        (word.at(start + 1) == '|'))) {
+
+      subsize = 3;
+
+   } else if (word.at(start) == '[') {
+       char p = word.at(start);
+       while (p != ']'){
+          p = word.at(start + subsize);
+          subsize = subsize + 1;
+       }
+   } else {
+
+      subsize = 1;
+
+   }
+
+   return word.substr(start, subsize);
+
+}
+
+
+bool compare(std::string letter, std::string eval){
+   std::cout << letter << std::endl;
+   std::cout << eval << std::endl;
+
+   if (eval.size() == 1){
+      if (eval.at(0) == '.'){
+         return (true)
+      } else if (eval.at(0) == letter.at(0)){
+         return (true)
+      }
+   }
+
+   return (false);
+}
+
+
+bool match(std::string input, std::string evalstring){
+   std::cout << "Starting to match" << std::endl;
+   std::cout << input << std::endl;
+   std::cout << evalstring << std::endl;
+
+   int strlen = input.size();
+   int evalpos = 0;
+   char curlett = '';
+   std::string eval;
+
+   for (int i = 0; i < strlen; i++){
+      char curLetter = input.substr(i, 1
+
+      string
+      compare(input.substr(i, 1), evalstring);
+   }
+
+   return (true);
+}
+
+
+int processFile(std::istream &f, std::string regex){
+   f >> std::noskipws;
+
+   char c = ' ';
+   std::string currline;
+   bool lmatch = false;
+   static int retVal = 0;
+
+   while (f >> c){
+      if (c == '\n'){
+        lmatch = match(currline, regex);
+        currline = "";
+      }else{
+        currline.push_back(c);
+      }
+   }
+   return retVal;
+}
+

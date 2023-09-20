@@ -1,0 +1,38 @@
+newInit a
+newDefault a
+empty a
+size a
+[] a 7
+[]= a 7 9999
+pop_front a
+[] a 7
+pop_front a
+pop_front a
+empty a
+size a
+pop_front a
+pop_back a
+at a 4
+empty a
+size a
+at a 2
+pop_back a
+newDefault b
+= b a
+empty b
+size b
+pop_back a
+pop_front a
+size a
+empty a
+push_front a 1
+push_back a 5
+size a
+empty a
+push_front a 2
+size a
+[]= a 2 99
+empty a
+push_front a 3
+push_back a 4
+[]= a 2 999

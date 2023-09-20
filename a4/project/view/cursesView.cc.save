@@ -1,0 +1,43 @@
+ #include <string>
+#include <tuple>
+
+#include "cursesView.h"
+#include "../model/gameRunner.h"
+
+CursesView::CursesView(GameRunner& game): game{game}, win{nullptr}, x{0} {
+   initscr();
+   win = newwin(25,80,5,5);
+   refresh();
+   box(win, 0, 0);
+}
+
+void CursesView::renderFrame() {
+   for (auto &elem : game.getObjects()) {
+      mvwaddch(win, std::get<1>(elem), std::get<0>(elem), std::get<3>(elem));
+   }
+}
+
+void CursesView::renderObjects() {
+   mvwaddch(win, x, x, 'a');
+   x++;
+}
+
+void CursesView::renderStatus() {
+   mvwaddstr(win, 22, 0, "STATUS BAR 1: ");
+   mvwaddstr(win, 23, 0, "STATUS BAR 2: ");
+   mvwaddstr(win, 24, 0, "STATUS BAR 3: ");
+
+}
+
+void CursesView::render() {
+   werase(win);
+   renderFrame();
+   renderObjects();
+   renderStatus();
+   wrefresh(win);
+}
+
+CursesView::~CursesView() {
+   delwin(win);
+   endwin();
+}

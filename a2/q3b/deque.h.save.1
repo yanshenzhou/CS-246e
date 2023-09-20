@@ -1,0 +1,55 @@
+#ifndef DEQUE_H
+#define DEQUE_H
+#include <iostream>
+#include "node.h"
+namespace cs246e {
+  class deque {
+      node** array;
+      size_t n;
+      int cap, min_idx, max_idx;
+     public:
+      deque();
+      size_t size() const { return n; }
+      bool empty() { return n == 0; }
+
+      void push_front(int val);
+      void push_back(int val);
+      void pop_front();
+      void pop_back();
+
+      int at(size_t pos);
+
+      class d_iterator {
+         node** data;
+         int loc;
+         node::iterator cur;
+         d_iterator(node** data, int loc, node::iterator cur): data{data}, loc{loc}, cur{cur} {}
+        public:
+         bool operator!=(d_iterator other) { return ((loc != other.loc) || (cur != other.cur)); }
+         int &operator*() {return *cur; }
+         d_iterator &operator++() {
+            if (data[loc]->end() != cur){
+               ++cur;
+               return *this;
+            } else {
+               loc = loc + 1;
+               cur = data[loc]->begin();
+               return *this;
+            }
+         }
+         friend class deque;
+
+      };
+
+      d_iterator begin() {return d_iterator{array, min_idx, array[min_idx]->begin()}; }
+      d_iterator end() {return d_iterator{array, max_idx, array[max_idx]->end()}; }
+
+     private:
+      void increaseCap();
+
+   };
+
+
+}
+
+#endif

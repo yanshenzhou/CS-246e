@@ -1,0 +1,22 @@
+#include "deque.h"
+#include "node.h"
+namespace cs246e {
+   deque::deque(): n{0}, cap{5}, min_idx{2}, max_idx{2} {
+      std::cout << "new array" << std::endl;
+
+      node init[5];
+      node *f
+      init[2] = first;
+      array = init;
+   }
+
+   void deque::push_back(int val) {
+      std::cout << array[2]->empty() << std::endl;
+      n = n + 1;
+   }
+
+   void deque::push_front(int val) {
+      n = n + 1;
+   }
+
+}

@@ -1,0 +1,23 @@
+#include "frame.h"
+
+Frame::Frame (int type) {
+   char hc = '=';
+   char vc = 186;
+   char cc = '\';
+   if (type == 0) {
+      for (int x = 1; x < 79; ++x) {
+        addPixel(x, 0, 1,'-');
+        addPixel(x, 21, 1, '-');
+      }
+      for (int y = 1; y < 21; ++y) {
+        addPixel(0, y, 1, '|');
+        addPixel(79, y, 1, '|');
+      }
+      addPixel(0, 0, 1, '+');
+      addPixel(0, 21, 1, '+');
+      addPixel(79, 0, 1, '+');
+      addPixel(79, 21, 1, '+');
+   } else { // Heavy Border
+
+   }
+}

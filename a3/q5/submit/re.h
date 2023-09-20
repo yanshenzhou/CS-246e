@@ -1,0 +1,331 @@
+#ifndef RE_H
+#define RE_H
+#include <iostream>
+#include <string>
+#include <memory>
+namespace CS246E {
+
+  /*
+     ===================== CLASSES ===========================
+  */
+
+
+  /*
+    RegExp: Our abstract virtual class from which all the regex components will inheirt.
+      Note that Word has a different field from Concatenation, Disjunction and Star so we cant
+      have a common field for the superclass. Each class needs to have a distructor and a matches function.
+      So we can include that in our super class
+  */
+
+  class RegExp {
+    public:
+
+     virtual bool matches(std::string s) = 0; // Make this a pure virtual function so it cant be called
+     virtual std::ostream &print(std::ostream &out) = 0; // pure virtual print method
+     virtual ~RegExp() {}; // Empty destructor as there are no fields to delete
+
+  };
+
+
+  /*
+    Disjunction: A regular expression in the form of {Left}|{Right}. Will contain a match if either the
+       Left of the Right regex contains a match.
+  */
+
+  class Disjunction: public RegExp {
+    std::unique_ptr<RegExp> left; // Stores a unique ptr the left regex
+    std::unique_ptr<RegExp> right; // Stores a unique ptr to the right regex
+   public:
+    Disjunction(std::unique_ptr<RegExp> l, std::unique_ptr<RegExp> r): left{std::move(l)}, right{std::move(r)} {}; // Moves the unique ptrs provided into our fields
+
+    bool matches (const std::string s) override {
+      return (left->matches(s) || right->matches(s)); // Returns true if theres a match on the left regex or the right regex
+    };
+
+    std::ostream &print (std::ostream &out) override { // Prints out the content of the disjunction
+      out << "Disjunction (";
+      left->print(out); // Print the contents of the left regex
+      out << ",";
+      right->print(out); // Print the contents of the right regex
+      out << ")";
+      return out;
+    };
+
+    ~Disjunction() override {
+       // No need to destroy field, as they are all unique_ptrs and will auto delete
+    }
+
+  };
+
+  /*
+     Concatenation: A regular expression in the form of (Left)(Right) which returns a match if for any possible "cut"
+       induuced in the string, the left regex has a match of the left side of the cut and the righ regex has a match for the
+       right side of the cut.
+     E.G: if the Regex is (aa)(bb) and we are given the string aabb, then a cut in between the second a and the first b would produce
+       a string "aa" on the left, and "bb" on the right which would match their respective regexs.
+  */
+  class Concatenation: public RegExp {
+    std::unique_ptr<RegExp> left; // Stores the unique pointer to the left regex
+    std::unique_ptr<RegExp> right; // Store the unique pointer to the right regex
+   public:
+    Concatenation(std::unique_ptr<RegExp> l, std::unique_ptr<RegExp> r): left{std::move(l)}, right{std::move(r)} {}; // Moves the unique ptrs provided into our fields
+
+    bool matches (const std::string s) override { // Takes in a string
+      for (size_t i = 0; i <= s.size(); i++) { // Loops through each index in the string
+        if (left->matches(s.substr(0, i)) && right->matches(s.substr(i, s.size()-i))) { // Make a "cut" at that location, and checks if the left and right match
+          return true;
+        }
+      }
+      return false;
+    };
+
+    std::ostream &print (std::ostream &out) override { // Print the contents of a concatentation
+       out << "Concatenation (";
+       left->print(out); // Print the left regex
+       out << ",";
+       right->print(out); // Print the right regex
+       out << ")";
+       return out;
+    };
+
+    ~Concatenation() override {
+       // No need to destory fields as they are all unique ptrs
+    };
+
+  };
+
+
+  /*
+     Star: A regular expression in the form of (center)* which will return match if the string can be split into n parts, and each of those
+        parts match the center regex.
+     E.G: Consider the regex (wa)* and consider the string wawawa. We can split the string into parts of size 2 to get "wa","wa","wa" which matches
+        the inside regex.
+  */
+
+  class Star: public RegExp {
+    std::unique_ptr<RegExp> center; // Stores a single unique pointer to the center regex
+   public:
+    Star(std::unique_ptr<RegExp> reg): center{std::move(reg)} {}; // Moves the contents of the provided unqiue ptr into our field
+
+    bool matches (const std::string s) override { // Takes in a string
+      int size = s.size(); // Stores the size so we only acess it once
+      if (size == 0) { return true; } // if the string is empty, star will always be a match
+      if (center->matches(s)) { return true; } // Skip everything if the whole string is a match
+
+      int pos = 0;
+      for (int i = 1; i < size; ++i) { // Loops through each part of the string
+         if (center->matches(s.substr(pos,i))) { // Checks to see if a part has a match
+            pos = pos + i; // Efficetivly "removes" this substring
+            i = 0;
+         }
+      }
+      return (s.substr(pos,size).size() == 0); // Checks to see if no strings are left over
+    };
+
+    std::ostream &print (std::ostream &out) override { // Prints the contents of a star regex
+       out << "Star (";
+       center->print(out); // Print the center value
+       out << ")";
+       return out;
+    }
+
+    ~Star() override {
+      // No need to delete a unique ptr
+    };
+
+  };
+
+
+  /*
+     Word: A regular express in the form of (center) will return a match if and only if the string exactly matches, with no leftovers too.
+  */
+
+  class Word: public RegExp {
+    std::unique_ptr<std::string> center; // A string unique pointer to hold the value of word
+   public:
+    Word(const std::string &s): center{std::move(new std::string(s))} {}; // Moves the word and points towards it
+    Word(std::string &&s): center{std::move(new std::string(s))} {}; // Moves the word into a string and makes a moves of it
+    bool matches (const std::string s) override { // Takes in a string
+      if (center->compare(s) == 0) { return true; } // If the string is a match return true
+      return false;
+    }
+
+    ~Word() override {
+      // No need to delete a unique ptr
+    };
+
+    std::ostream &print (std::ostream &out) override { // Prints out a word regex
+      out << *center; // Dereference and print the contents of the string pointer
+      return out;
+    }
+
+  };
+
+
+  /*
+      Begin: A regular expression that will only return true if its given the start of the string.
+  */
+
+  class Begin: public RegExp {
+    public:
+     Begin() {}
+     bool matches (const std::string s) override {
+        if (s.size() == 1 && s[0] == '\200') { return true; } // Returns true if at the start of the string
+        return false;
+     }
+
+     std::ostream &print (std::ostream &out) override {
+        out << '^';
+        return out;
+     }
+  };
+
+
+  /*
+     End: A regular expression that will only return true if its given the end of the string.
+  */
+
+  class End: public RegExp {
+    public:
+     End() {}
+     bool matches (const std::string s) override {
+        if (s.size() == 1 && s[0] == '\201') { return true; } // Returns true if at the send of the string
+        return false;
+     }
+
+     std::ostream &print (std::ostream &out) override {
+        out << '$';
+        return out;
+     }
+  };
+
+  /*
+     Dot: A regular expression that returns true for any string
+  */
+
+  class Dot: public RegExp {
+    public:
+     Dot() {}
+     bool matches (const std::string s) override {
+        if (s.size() == 1) { return true; } // Returns true for any character
+        return false;
+     }
+
+     std::ostream &print (std::ostream &out) override {
+        out << '.';
+        return out;
+     }
+  };
+  /*
+    ======================= ProtoTypes ====================
+  */
+
+  // In order for functions to refer to ones that havent been created yet we have the following ProtoTypes
+  std::unique_ptr<RegExp> parseConcatenation (const std::string s);
+  std::unique_ptr<RegExp> parseStar (const std::string s);
+  std::unique_ptr<RegExp> parseWord (const std::string s);
+
+  /*
+    ======================= Functions ======================
+  */
+
+  // Function for checking if a string has a substring match
+  bool containsMatch(RegExp *re, const std::string &s) {
+     std::string s2 = '\200' + s + '\201';
+     for (size_t i = 0; i < s2.size(); i++) {
+        for (size_t x = 0; x <= s2.size(); x++) {
+           if (re->matches(s2.substr(i,x)) == true) { return true; }
+        }
+     }
+     return false;
+  }
+
+  // Checks to see if the given string is a disjunction or not
+  std::unique_ptr<RegExp> parseDisjunction (const std::string s) {
+     int size = s.size();
+     int paraDepth = 0; // Variable for checking if we are encased in parantheses
+
+     for (int i = 0; i < size; i++) { // Loops through the whole string
+        if (s[i] == '(') { ++paraDepth; }
+        else if (s[i] == ')') { --paraDepth; }
+        else if (paraDepth == 0 && s[i] == '|') {
+          const std::string s1 = s.substr(0, i);
+          const std::string s2 = s.substr(i+1, size-i-1);
+          return std::make_unique<Disjunction>( // Make a new disjunction with the left and right sides of the '|'
+             parseDisjunction(s1), parseDisjunction(s2)
+          );
+        }
+     }
+     return parseConcatenation(s);
+  };
+
+  // Check to see if the given string is a concatenation or not
+  std::unique_ptr<RegExp> parseConcatenation (const std::string s) {
+     int size = s.size();
+     if (size < 2) { return parseWord(s); } // If the string is a single part (or nothing), we will treat it as a word
+     if (s[0] == '(') { // If it starts with a '(' we will assume that a ')' exists somewhere
+        int depth = 1;
+        for (int i = 1; i < size; i++) { // Loops through the string
+           if (s[i] == ')') { --depth; }
+           if (depth == 0 && s[i] != '*' && s[i] != ')') { // If we reach something thats not a ')' or '*' it must be a seperate regex E.G (ab)cd 
+              return std::make_unique<Concatenation>(
+                 parseDisjunction(s.substr(0, i)),
+                 parseDisjunction(s.substr(i, size))
+              );
+           }
+           if (s[i] == '(') { ++depth; }
+           if (i == size - 1) {
+              if (s[i] == '*') { // If we reach the end and it has a *, this means its a giant star rege
+                 return parseStar(s);
+              } else if (s[i] == ')') { // If we reach the end and its a ')' this implies the whole thing is covered in brackets
+                 return parseDisjunction(s.substr(1, size-2)); // Gets rid of the brackets
+              }
+           }
+        }
+     }
+     else if (s[1] != '*') { // If the second term is not a *, it means we can take the first character out and concanteinate it to the rest
+        return std::make_unique<Concatenation> (
+            parseWord(s.substr(0,1)),
+            parseDisjunction(s.substr(1,size))
+        );
+     } else if (s[1] == '*' && size > 2) { // If it has a star we will search until there is not star and concatenate that
+        for (int i = 1; i < size; i++) {
+            if (s[i] != '*') {
+               return std::make_unique<Concatenation>(
+                  parseDisjunction(s.substr(0, i)),
+                  parseDisjunction(s.substr(i, size))
+               );
+            }
+        }
+     }
+     return parseStar(s);
+  }
+
+  std::unique_ptr<RegExp> parseStar (const std::string s) {
+     int size = s.size();
+     if (s[size-1] == '*') { //If it ends in a star, then we treat it as a star
+        return std::make_unique<Star>(parseDisjunction(s.substr(0,size-1)));
+     }
+     return parseWord(s);
+  }
+
+
+  std::unique_ptr<RegExp> parseWord (const std::string s) {
+    if (s.size() == 1 && s[0] == '^') { return std::make_unique<Begin>(); }
+    if (s.size() == 1 && s[0] == '$') { return std::make_unique<End>(); }
+    if (s.size() == 1 && s[0] == '.') { return std::make_unique<Dot>(); }
+    return std::make_unique<Word>(s); // Make a new word
+  }
+
+  /*
+    ===================== OverLoad =========================
+  */
+
+
+  std::ostream &operator<<(std::ostream &out, RegExp &re) { // Overload as asked for in the question
+     return re.print(out);
+  };
+
+}
+#endif
+

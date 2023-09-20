@@ -1,0 +1,84 @@
+#include "deque.h"
+#include "node.h"
+namespace cs246e {
+   deque::deque(): n{0}, cap{5}, min_idx{2}, max_idx{2} {
+      static node *init[5];
+      node *first = new node();
+      init[2] = first;
+      array = init;
+   }
+
+   void deque::push_back(int val) {
+      n = n + 1;
+      if (array[max_idx]->right_full()) {
+         increaseCap();
+         max_idx = max_idx + 1;
+         array[max_idx] = new node();
+      }
+      array[max_idx]->add_right(val);
+   }
+
+   void deque::push_front(int val) {
+      n = n + 1;
+      if (array[min_idx]->left_full()) {
+         increaseCap();
+         min_idx = min_idx - 1;
+         array[min_idx] = new node();
+      }
+      array[min_idx]->add_left(val);
+   }
+
+   void deque::pop_back(){
+      n = n - 1;
+      if (array[max_idx]->empty()) {
+         max_idx = max_idx - 1;
+      }
+      array[max_idx]->remove_right();
+
+   }
+
+   void deque::pop_front(){
+      n = n - 1;
+      if (array[min_idx]->empty()) {
+         min_idx = min_idx + 1;
+      }
+      array[min_idx]->remove_left();
+   }
+
+   int deque::at(size_t pos) {
+     for (int i = min_idx; i < max_idx; i++){
+        if (pos <= array[i]->size()) {
+           return(array[i]->getData(pos));
+        }
+        pos = pos - array[i]->size();
+     }
+     return(array[max_idx]->getData(pos));
+   }
+
+   void deque::printAll() {
+     for (int i = min_idx; i < max_idx; i++){
+        try {
+           std::cout << i << "EMPTY" << std::endl;
+        } else {
+           std::cout << i << "ALL" << std::endl;
+        }
+     }
+   }
+
+   void deque::increaseCap() {
+      if ((max_idx == cap - 1 && array[max_idx]->right_full()) ||
+          (min_idx == 0 && array[min_idx]->left_full())) {
+
+          std::cout << "MAKE NEW ARRAY" << std::endl;
+          static node** newArray = new node*[cap*2+1];
+          for (int i = 0; i < cap; i++) newArray[i+cap/2+1] = array[i];
+
+          array = newArray;
+          max_idx = cap/2+1 + max_idx;
+          min_idx = cap/2+1 + min_idx;
+          cap = cap*2 + 1;
+
+      }
+   }
+
+}

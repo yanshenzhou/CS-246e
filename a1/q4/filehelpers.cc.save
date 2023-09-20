@@ -1,0 +1,66 @@
+#include <iostream>
+#include <string>
+#include <cstdio>
+#include <fstream>
+
+bool fileExists(std::string filename){
+   FILE *fpin = fopen(filename.c_str(), "r");
+   if (fpin){
+      fclose(fpin);
+      return true;
+   } else {
+      return false;
+   }
+}
+
+std::string getArgs(std::string root){
+   std::string fileName = root + ".arg";
+
+   if (fileExists(fileName)){
+      std::string curLine = "";
+      std::ifstream f {fileName};
+
+      char c;
+
+      f >> std::noskipws;
+      while (f >> c){
+         if (c != '\n'){
+            curLine.push_back(c);
+         }
+      }
+      return curLine;
+   }
+   return "";
+}
+
+std::string getInput(std::string root){
+   std::string fileName = root + ".in";
+
+   if (fileExists(fileName)){
+      std::string curLine;
+      std::ifstream f {fileName};
+
+      char c;
+
+      f >> std::noskipws;
+      while (f >> c){
+         curLine.push_back(c);
+      }
+      return curLine;
+   }
+   return "";
+}
+
+bool runCommand(std::string command){
+    FILE* f = popen(command.c_str(), "r");
+}
+
+bool testFile(std::string root, std::string binary){
+    std::string lineTo;
+    lineTo = binary + " " + getArgs(root) + " " + getInput(root);
+
+    std::cout << lineTo << std::endl;
+
+    runCommand(lineTo);
+    return true;
+}

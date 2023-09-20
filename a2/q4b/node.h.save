@@ -1,0 +1,43 @@
+#ifndef NODE_H
+#define NODE_H
+#include <iostream>
+
+namespace cs246e {
+  template<typename K, typename V> class node {
+     K key;
+     V val;
+     node<K,V> *lnode;
+     node<K,V> *rnode;
+    public:
+     node() {}
+     node(K key, V val): key{key}, val{val}, lnode{nullptr}, rnode{nullptr} {}
+
+     V value() { return val; }
+     int compareKey(K other) {
+        if (other == key){
+           return (1);
+        } else if (other < key){
+           return (0);
+        }
+        return (2);
+     }
+
+     node<K,V> getLeft() { return *lnode; }
+     node<K,V> getRight() { return *rnode; }
+
+     void setLeft(K initKey, V initVal) {
+      
+     }
+
+     void print() {
+        std::cout << "Key: " << key << " | Value: " << val;
+        std::cout << " | Left: " << (lnode == nullptr ? "empty":"hasValue");
+        std::cout << " | Right: " << (rnode == nullptr ? "empty":"hasValue");
+        std::cout << std::endl;
+
+     }
+
+  };
+}
+#endif
+

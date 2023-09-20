@@ -1,0 +1,125 @@
+#include <iostream>
+#include <string>
+#include <cstdio>
+#include <fstream>
+
+bool fileExists(std::string filename){
+   FILE *fpin = fopen(filename.c_str(), "r");
+   if (fpin){
+      fclose(fpin);
+      return true;
+   } else {
+      return false;
+   }
+}
+
+std::string getArgs(std::string root, bool x){
+   std::string fileName = root + ".arg";
+
+   if (fileExists(fileName)){
+      std::string curLine = "";
+      std::ifstream f {fileName};
+
+      char c;
+
+      f >> std::noskipws;
+      while (f >> c){
+         if (c != '\n' || x){
+            curLine.push_back(c);
+         }
+      }
+      if (!x && curLine.back() == '\n'){
+         curLine.pop_back();
+      }
+      return curLine;
+   }
+   return "";
+}
+
+std::string getInput(std::string root){
+   std::string fileName = root + ".in";
+
+   if (fileExists(fileName)){
+      std::string curLine;
+      std::ifstream f {fileName};
+
+      char c;
+
+      f >> std::noskipws;
+      while (f >> c){
+         curLine.push_back(c);
+      }
+      if (curLine.back() == '\n'){
+         curLine.pop_back();
+      }
+      return curLine;
+   }
+   return "";
+}
+
+bool runCommand(std::string command, std::string output, std::string input, std::string *exp, std::string *act){
+    std::string merged = command + input;
+
+    FILE* f = popen(merged.c_str(), "r");
+
+    if (f == NULL) {
+       std::cerr << "Not enough arguments / Invalid arguments provided" << std::endl;
+       fclose(f);
+       return true;
+    } else {
+       char c = fgetc(f), d;
+       std::string texp, tact;
+       while (c != EOF) {
+          tact.push_back(c);
+          c = fgetc(f);
+       }
+       fclose(f);
+       FILE* fp = fopen(output.c_str(), "r");
+       d = fgetc(fp);
+       while (d != EOF) {
+          texp.push_back(d);
+          d = fgetc(fp);
+       }
+       fclose(fp);
+       *act = tact;
+       *exp = texp;
+       if (tact.compare(texp) == 0){
+          return true;
+       }
+       return false;
+    }
+}
+
+bool testFile(std::string root, std::string binary){
+    std::string lineTo, lineOut, input;
+    lineTo = binary + " " + getArgs(root, true);
+    lineOut = root + ".out";
+    input = " " + getInput(root);
+
+    if (!fileExists(lineOut)){
+       std::cerr << "Missing or unreadable .out file" << std::endl;
+       return false;
+    }
+
+    std::string exp = " ", act = " ";
+    bool testWork = false;
+    testWork = runCommand(lineTo, lineOut, input, &exp, &act);
+
+    if (testWork){
+       return true;
+    }
+    std::cout << "Test failed: "  << std::endl;
+    std::cout << "Args:" << std::endl;
+    if (getArgs(root, false).compare("") != 0) {
+        std::cout << getArgs(root, false) << std::endl;
+    }
+    std::cout << "Input:" << std::endl;
+    if (getInput(root).compare("") != 0) {
+       std::cout << getInput(root)
+    }
+    std::cout << "Expected:" << std::endl;
+    std::cout << exp << std::endl;
+    std::cout << "Actual:" 
+    std::cout << act << std::endl;
+    return true;
+}

@@ -1,0 +1,77 @@
+#ifndef TREE_H
+#define TREE_H
+#include <iostream>
+#include "node.h"
+
+namespace cs246e {
+  template<typename K, typename V> class tree {
+     size_t size;
+     node<K,V> *head;
+    public:
+     tree(): size{0}, head{nullptr} {}
+
+
+     void add(K key, V value){
+        if (replaceKey(key, value) == false){
+           addNode(K
+        }
+     }
+
+     void addNode(K key, V value) {
+        if (head == nullptr){
+          head = new node<K,V>(key, value, size + 1);
+          size = size + 1;
+        } else {
+          travToNode(key, value, head);
+        }
+
+     }
+
+     void travToNode(K key, V value, node<K,V> * cur){
+        if (cur->right() == nullptr) {
+           cur->setRight(key, value, size + 1);
+           size = size + 1;
+        } else if (cur->left() == nullptr) {
+           cur->setLeft(key, value, size + 1);
+           size = size + 1;
+        } else {
+           if (cur->leftCount() > cur->rightCount()){
+              travToNode(key, value, cur->left());
+           } else {
+              travToNode(key, value, cur->right());
+           }
+        }
+    }
+
+    bool replaceKey(K queryKey, V replaceValue){
+       if (head == nullptr){
+          return false;
+       }
+       return findKey(head, queryKey, replaceValue);
+
+    }
+
+    bool findKey(node<K,V>* curNode, K key, V repVal) {
+       if (curNode == nullptr) { return false; }
+       if (curNode->getKey() == key) { curNode->setValue(repVal); return true; }
+       return (findKey(curNode->left(), key, repVal) ||
+               findKey(curNode->right(), key, repVal));
+    }
+
+    void print(){
+       printNode(head);
+    }
+
+    void printNode(node<K,V> *currNode){
+       if (currNode != nullptr){
+          currNode->print();
+          printNode(currNode->left());
+          printNode(currNode->right());
+       }
+    }
+
+
+  };
+}
+#endif
+

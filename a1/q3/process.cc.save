@@ -1,0 +1,142 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+
+#include "process.h"
+
+std::string getcurrenteval(std::string word, int start){
+   int subsize = 0;
+   int wlength = word.size();
+
+   if ((start + 1 < wlength) &&
+       ((word.at(start + 1) == '*') ||
+        (word.at(start + 1) == '+') ||
+        (word.at(start + 1) == '?'))) {
+
+      subsize = 2;
+
+   } else if (word.at(start) == '[') {
+       char p = word.at(start);
+       while (p != ']'){
+          p = word.at(start + subsize);
+          subsize = subsize + 1;
+       }
+   } else {
+
+      subsize = 1;
+
+   }
+
+   return word.substr(start, subsize);
+
+}
+
+
+bool compare(std::string letter, std::string eval, int* am){
+   std::cout << letter << std::endl;
+   std::cout << eval << std::endl;
+
+   if (eval.size() == 1){
+      if (eval.at(0) == '.' || eval.at(0) == letter.at(0)){
+         return(true);
+      }
+
+   } else if (eval.size() >= 2) {
+      if (eval.at(0) == '['){
+         int disp = 0;
+         if (eval.at(1) == '^'){
+            disp = 1;
+         }
+         std::string query = eval.substr(1 + disp, eval.size() -2 -disp);
+         std::cout << query << std::endl;
+
+         bool inrange = false;
+         for (int i = 0; i < query.size(); i++){
+            if (query.at(i) == letter.at(0)){
+               inrange = true;
+            }
+
+         }
+
+         return ((inrange + disp)%2);
+      } else if (eval.at(1) == '*' || eval.at(1) == '?' || eval.at(1) == '+'){
+         *am = 0;
+         char currlett = letter.at(*am);
+
+         while (*am < letter.size() && currlett == eval.at(0)){
+            *am = *am +1;
+            std::cout << *am << std::endl;
+            if (*am < letter.size()){
+                currlett = letter.at(*am);
+            }
+            std::cout << currlett << std::endl;
+         }
+         if (eval.at(1) == '?'){
+            if(*am > 1) {
+           
+            }
+         }
+         std::cout << *am << std::endl;
+      }
+
+   }
+   return (false);
+}
+
+
+bool match(std::string input, std::string evalstring){
+   std::cout << "Starting to match" << std::endl;
+   std::cout << input << std::endl;
+   std::cout << evalstring << std::endl;
+
+   int strlen = input.size();
+   int evalpos = 0;
+   std::string letter;
+   std::string evalslice;
+
+   bool wordmatch = false;
+
+   for (int i = 0; i < strlen; i++){
+      letter = input.substr(i, input.size());
+      evalslice = getcurrenteval(evalstring, evalpos);
+
+      int am = 0;
+      wordmatch = compare(letter, evalslice, &am);
+      if (wordmatch){
+         evalpos = evalpos + evalslice.size();
+         std::cout << "word is a match" << std::endl;
+      } else {
+         evalpos = 0;
+         std::cout << "word is not a match" << std::endl;
+      }
+
+      std::cout << am << std::endl;
+
+      if (evalpos == evalstring.size()){
+         return (true);
+      }
+   }
+
+   return (false);
+}
+
+
+int processFile(std::istream &f, std::string regex){
+   f >> std::noskipws;
+
+   char c = ' ';
+   std::string currline;
+   bool lmatch = false;
+   static int retVal = 0;
+
+   while (f >> c){
+      if (c == '\n'){
+        lmatch = match(currline, regex);
+        currline = "";
+      }else{
+        currline.push_back(c);
+      }
+   }
+   return retVal;
+}
+

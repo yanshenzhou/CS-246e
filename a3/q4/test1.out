@@ -1,0 +1,14 @@
+Disjunction (Concatenation (.,Concatenation (a,.)),Disjunction (Concatenation (.,Concatenation (b,.)),Concatenation (.,Concatenation (c,Star (.)))))
+true
+true
+true
+true
+true
+false
+false
+false
+false
+true
+false
+false
+true

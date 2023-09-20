@@ -1,0 +1,28 @@
+newDefault a
+empty a
+size a
+at a 1
+count a 1
+[] a 1
+count a 1
+[] a 0
+[] a 2
+empty a
+size a
+[]= a 0 99
+[]= a 1 88
+size a 
+empty a
+[]= a 5 72
+count a 5
+erase a 5
+count a 5
+[] a 5
+count a 5
+clear a
+newInit a
+size a
+count a 2
+[] a 2
+size a
+clear a

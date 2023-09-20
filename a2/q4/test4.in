@@ -1,0 +1,39 @@
+newInit a
+newDefault b
+newDefault c
+empty a
+empty b
+empty c
+size a
+size b
+size c
+= c a
+clear c
+= c a
+at c 1
+[] c 1
+at a 1
+[] c 1
+erase c 1
+at c 1
+[] c 1
+at a 1
+[] c 1
+= a b
+clear b
+clear c
+size a
+size b
+size c
+empty a
+empty c
+[]= a 1 821928191
+[]= b 219021 1
+[]= c 0 12
+[]= d 1 1
+empty d
+size d
+at d 1
+[] d 1
+= d a
+clear

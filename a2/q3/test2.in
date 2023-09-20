@@ -1,0 +1,30 @@
+newDefault a
+[]= b 1
+pop_front b
+size a
+empty a
+size b
+empty b
+push_back a 2
+push_front a 1
+size a
+empty a
+size b
+empty b
+[] a 0
+[] b 0
+[]= a 1 65
+newInit b
+newDefault tmp
+size a
+size b
+= tmp a
+= a b
+= b tmp
+size a
+size b
+push_back b 5
+size a
+size b
+
+

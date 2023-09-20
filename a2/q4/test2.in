@@ -1,0 +1,58 @@
+newDefault a
+[]= b 0 1
+clear b
+newDefault tmp
+[] a 0
+[] a 1
+[] a 2
+[] a 3
+size a
+size b
+size tmp
+empty a
+empty b
+empty tmp
+clear tmp
+= tmp a
+= a b
+= b tmp
+clear tmp
+empty a 
+empty b
+empty tmp
+at b 0
+at b 1
+at b 15
+[]= a 0 99
+[]= a 1 88
+[]= a 5 81
+[] b 9 
+[]= b 0 21
+count b 0
+count b 1
+count a 5
+count b 99
+count a 21
+size a
+size b
+empty a 
+empty b
+clear tmp
+= tmp a
+= a b
+= b tmp
+size tmp
+count tmp 0
+clear tmp
+erase a 0
+erase a 1
+erase a 2
+erase a 3
+count a 0
+count a 1
+count a 2
+count a 3
+size a
+empty a
+at a 0
+

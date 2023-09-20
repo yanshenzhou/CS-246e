@@ -1,0 +1,121 @@
+#ifndef DEQUE_H
+#define DEQUE_H
+#include <iostream>
+#include "node.h"
+#include <initializer_list>
+
+namespace cs246e {
+  template<typename T> class deque {
+      node<T>** array;
+      size_t n;
+      int cap, min_idx, max_idx;
+     public:
+      deque(): n{0}, cap{5}, min_idx{2}, max_idx{2} {
+         static node<T> *init[5];
+         node<T> *first = new node<T>();
+         init[2] = first;
+         array = init;
+      }
+
+      deque(std::initializer_list<T> init): n{init.size()}, cap{init.size()/4+5}, min_idx{2}, max_idx{2} {
+         
+         node<T> *s_list[init.size()/4+10];
+         node<T> *first = new node<T>();
+         s_list[2] = first;
+         for (i = 0; i < init.size(); i++) {
+            if (s_list[max_idx]->right_full()){
+               max_idx = max_idx + 1;
+               s_list[max_idx] = new node<T>();
+            }
+            s_list[max_idx]->add_right(init[i]);
+         }
+         array = s_list;
+      }
+
+      size_t size() const { return n; }
+      bool empty() { return n == 0; }
+
+      void push_back(T val){
+         n = n + 1;
+         if(array[max_idx]->right_full()){
+            max_idx = max_idx + 1;
+            array[max_idx] = new node<T>();
+         }
+         array[max_idx]->add_right(val);
+      }
+      void push_front(T val){
+         n = n + 1;
+         if(array[min_idx]->left_full()){
+            min_idx = min_idx - 1;
+            array[min_idx] = new node<T>();
+         }
+         array[min_idx]->add_left(val);
+      }
+      void pop_front(){
+         n = n - 1;
+         if(array[min_idx]->empty()) {
+            min_idx = min_idx + 1;
+         }
+         array[min_idx]->remove_left();
+
+      }
+      void pop_back(){
+         n = n - 1;
+         if(array[max_idx]->empty()) {
+            max_idx = max_idx - 1;
+         }
+         array[max_idx]->remove_right();
+
+      }
+
+      T at(size_t pos){
+         for (int i = min_idx; i < max_idx; i++) {
+            if (pos <= array[i]->size()) {
+               return(array[i]->getData(pos));
+            }
+            pos = pos - array[i]->size();
+         }
+         return(array[max_idx]->getData(pos));
+      }
+
+      class iterator {
+         node<T>** data;
+         size_t loc;
+         int start, end;
+         iterator(node<T>** data, size_t loc, int s, int e): data{data}, loc{loc}, start{s}, end{e} {}
+        public:
+         bool operator!=(iterator other) { return (loc != other.loc); }
+         T operator*() {
+            size_t sum = loc;
+            for (int i = start; i < end; ++i){
+               if (sum < data[i]->size()){
+                  return data[i]->getData(sum);
+               }
+               sum -= data[i]->size();
+            }
+            return data[end]->getData(sum);
+         }
+
+         iterator &operator++() {
+            loc = loc + 1;
+            return *this;
+         }
+
+         size_t loc_h() { return loc; }
+
+         friend class deque;
+
+      };
+
+      iterator begin() { return iterator{array, 0, min_idx, max_idx}; }
+      iterator end() { return iterator{array, n, min_idx, max_idx}; }
+
+     private:
+      void increaseCap();
+
+   };
+
+
+}
+
+#endif

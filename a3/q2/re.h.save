@@ -1,0 +1,42 @@
+#ifndef RE_H
+#define RE_H
+#include <iostream>
+#include <string>
+
+namespace cs246e {
+
+  class RegExp {
+    public:
+
+     virtual bool matches(std::string s) = 0;
+     virtual ~RegExp() {};
+
+  };
+
+  class Star: public RegExp {
+    RegExp *center;
+   public:
+    
+
+
+  class Word: public RegExp {
+    std::string *center;
+   public:
+    Word(const std::string &s): center{new std::string(s)} {};
+    Word(std::string &&s): center{new std::string(s)} {};
+
+    bool matches (const std::string s) override {
+      if (center->compare(s) == 0) { return true; }
+      return false;
+    }
+
+    ~Word() override {
+      delete [] center;
+      center = nullptr;
+    };
+
+
+  };
+}
+#endif
+

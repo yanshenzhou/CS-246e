@@ -1,0 +1,68 @@
+#include <iostream>
+#include <string>
+#include <cstdio>
+#include <fstream>
+
+bool fileExists(std::string filename){
+   std::string command;
+   command = "[ -r " + filename +" ] ";
+   if (WEXITSTATUS(system(command.c_str())) == 0){
+      return true;
+   }
+   return false;
+}
+
+bool runCommand(std::string command, std::string output, std::string input, std::string *exp, std::string act, int *xc){
+    std::string place;
+    std::string tmpout = tmpnam(NULL);
+    place = command;
+    if (fileExists(act)){
+       place = place + "\"$(cat " + act + ")\"";
+    }
+    if (fileExists(input)){
+       place = place + " < " + input;
+    }
+    place = place + " > " + tmpout;
+    system(place.c_str());
+    place = "diff " + tmpout + " " + output + " > /dev/null";
+    *exp = tmpout;
+
+    if (WEXITSTATUS(system(place.c_str())) == 0){
+       return true;
+    }
+    return false;
+}
+
+bool testFile(std::string root, std::string binary){
+    std::string lineTo, lineOut, input;
+    lineTo = binary;
+    lineOut = root + ".out";
+    input = root + ".in";
+
+    std::string exp = " ", act = " ";
+    bool testWork = false;
+    int exitcode;
+    testWork = runCommand(lineTo, lineOut, input, &exp, root + ".arg", &exitcode);
+    if (testWork){
+       return true;
+    }
+    std::string place;
+    std::cout << "Test failed: " + root  << std::endl;
+    std::cout << "Args:" << std::endl;
+    if (fileExists(root + ".arg")){
+       place = "cat " + root + ".arg";
+       system(place.c_str());
+    }
+    std::cout << "Input:" << std::endl;
+    if (fileExists(root + ".in")){
+       place = "cat " + root + ".in";
+       system(place.c_str());
+    }
+    std::cout << "Expected:" << std::endl;
+    place = "cat " + root + ".out";
+    system(place.c_str());
+    std::cout << "Actual:" << std::endl;
+    place = "cat " + exp;
+    system(place.c_str());
+    return true;
+}

@@ -1,0 +1,18 @@
+No numbers here
+1 number is here
+the number 1 is in the middle
+there are 2 numbers 1 in this
+there are 1 2 3 digits here
+321
+1
+12
+123
+1234
+12345
+123456
+1234567
+1 3 5 78
+123456789
+12345 7 91
+I have 1234 digits here so this sentance should print
+I have 123 digits here so this sentance should not print
